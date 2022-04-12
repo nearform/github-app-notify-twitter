@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "tap",
     "prepare": "husky install"
   },
   "repository": {
@@ -29,14 +29,19 @@
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "tap": "^16.0.1"
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --cache --fix"
   },
   "dependencies": {
+    "desm": "^1.2.0",
     "dotenv": "^16.0.0",
+    "env-schema": "^4.0.0",
     "fastify": "^3.28.0",
+    "fluent-json-schema": "^3.1.0",
+    "pino-pretty": "^7.6.1",
     "twitter-api-v2": "^1.11.3"
   }
 }

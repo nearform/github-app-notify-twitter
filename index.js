@@ -1,6 +1,7 @@
 import buildServer from './server.js'
+import config from './config.js'
 
-const server = buildServer()
+const server = buildServer(config)
 
 const start = async () => {
   try {
