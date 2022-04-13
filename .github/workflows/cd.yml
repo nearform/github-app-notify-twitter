@@ -12,58 +12,17 @@ on:
         default: 'github-app-notify-twitter'
 
 jobs:
-  provision:
-    name: 'Provision and deploy'
+  deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: 'read'
-      id-token: write
-
-    env:
-      GCP_PROJECT_ID: github-app-notify-twitter
-      GCP_REGION: europe-west1
-      RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || 'github-app-notify-twitter' }}
-      RUN_CPU: 1
-      RUN_MEM: 2G
     steps:
       - uses: actions/checkout@v3
-
-      - name: 'Authenticate with GCP'
-        uses: google-github-actions/auth@v0
+      - uses: google-github-actions/deploy-cloudrun@v0.9.0
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - name: 'Set up Cloud SDK'
-        uses: google-github-actions/setup-gcloud@v0
-
-      - name: 'Deploy to Cloud Run'
-        id: deploy
-        run: >-
-          gcloud run deploy ${{ env.RUN_SERVICE_NAME }}
-          --region=${{ env.GCP_REGION }}
-          --cpu=${{ env.RUN_CPU }}
-          --memory=${{ env.RUN_MEM }}
-          --revision-suffix=${{ github.sha }}
-          --source=.
-          --set-env-vars='
-          NODE_ENV=production,
-          TWITTER_API_KEY=${{ secrets.TWITTER_API_KEY }},
-          TWITTER_API_SECRET=${{ secrets.TWITTER_API_SECRET }},
-          TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }},
-          TWITTER_ACCESS_TOKEN_SECRET=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}'
-
-      - name: 'Retrieve the Cloud Run service url'
-        run: echo "RUN_URL=$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
-
-      - name: 'Make the service public'
-        run: >-
-          gcloud run services add-iam-policy-binding ${{ env.RUN_SERVICE_NAME }}
-          --member="allUsers"
-          --role="roles/run.invoker"
-          --region=${{ env.GCP_REGION }}
-
-      - name: 'Show summary'
-        run: >-
-          echo "App successfully deployed to: ${{ env.RUN_URL }}."
+          service: ${{ secrets.GCP_CLOUDRUN_SERVICE_NAME }}
+          region: ${{ secrets.GCP_CLOUDRUN_SERVICE_REGION }}
+          credentials: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          env_vars: TWITTER_API_KEY=${{ secrets.TWITTER_API_KEY }},TWITTER_API_SECRET=${{ secrets.TWITTER_API_SECRET }},TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }},TWITTER_ACCESS_TOKEN_SECRET=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          flags: --allow-unauthenticated
+          source: .
