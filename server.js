@@ -25,8 +25,8 @@ export default function buildServer(config) {
 
   fastify.post('/release', async (request, reply) => {
     try {
-      const appKey = config.TWITTER_APP_KEY
-      const appSecret = config.TWITTER_APP_SECRET
+      const appKey = config.TWITTER_API_KEY
+      const appSecret = config.TWITTER_API_SECRET
       const accessToken = config.TWITTER_ACCESS_TOKEN
       const accessSecret = config.TWITTER_ACCESS_TOKEN_SECRET
       const { action, release, repository } = request.body
