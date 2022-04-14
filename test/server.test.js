@@ -1,5 +1,6 @@
 'use strict'
 
+import { createHmac } from 'crypto'
 import { TwitterApi } from 'twitter-api-v2'
 import buildServer from '../src/server.js'
 import {
@@ -18,6 +19,16 @@ const testServer = buildServer({
   TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET
 })
 
+const generateHeaderHash = (
+  reqBody,
+  secret = process.env.GH_WEBHOOK_SECRET
+) => {
+  const hash = createHmac('sha256', secret)
+  hash.update(reqBody)
+
+  return `sha256=${hash.digest('hex')}`
+}
+
 jest.mock('twitter-api-v2')
 
 describe('GH app', () => {
@@ -25,14 +36,33 @@ describe('GH app', () => {
     jest.clearAllMocks()
   })
 
-  it('release route, missing action, repository and release inputs', async () => {
+  it('release route, verifyRequest hook fails due to different secret', async () => {
+    const body = JSON.stringify({})
+
     const response = await testServer.inject({
       method: 'POST',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'x-hub-signature-256': generateHeaderHash(body, 'another secret')
       },
       url: '/release',
-      body: JSON.stringify({})
+      body
+    })
+
+    expect(response.statusCode).toBe(401)
+  })
+
+  it('release route, missing action, repository and release inputs', async () => {
+    const body = JSON.stringify({})
+
+    const response = await testServer.inject({
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-hub-signature-256': generateHeaderHash(body)
+      },
+      url: '/release',
+      body
     })
 
     expect(response.statusCode).toBe(500)
@@ -40,23 +70,25 @@ describe('GH app', () => {
   })
 
   it('release route, private repository', async () => {
+    const body = JSON.stringify({
+      action: 'published',
+      repository: {
+        name: 'test_repo',
+        private: true
+      },
+      release: {
+        tag_name: '1.0.0',
+        html_url: 'http://example.com'
+      }
+    })
     const response = await testServer.inject({
       method: 'POST',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'x-hub-signature-256': generateHeaderHash(body)
       },
       url: '/release',
-      body: JSON.stringify({
-        action: 'published',
-        repository: {
-          name: 'test_repo',
-          private: true
-        },
-        release: {
-          tag_name: '1.0.0',
-          html_url: 'http://example.com'
-        }
-      })
+      body
     })
 
     expect(response.statusCode).toBe(200)
@@ -64,23 +96,26 @@ describe('GH app', () => {
   })
 
   it('release route, action is not "published"', async () => {
+    const body = JSON.stringify({
+      action: 'edited',
+      repository: {
+        name: 'test_repo',
+        private: false
+      },
+      release: {
+        tag_name: '1.0.0',
+        html_url: 'http://example.com'
+      }
+    })
+
     const response = await testServer.inject({
       method: 'POST',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'x-hub-signature-256': generateHeaderHash(body)
       },
       url: '/release',
-      body: JSON.stringify({
-        action: 'edited',
-        repository: {
-          name: 'test_repo',
-          private: false
-        },
-        release: {
-          tag_name: '1.0.0',
-          html_url: 'http://example.com'
-        }
-      })
+      body
     })
 
     expect(response.statusCode).toBe(200)
@@ -106,23 +141,26 @@ describe('GH app', () => {
       TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET
     })
 
+    const body = JSON.stringify({
+      action: 'published',
+      repository: {
+        name: 'test_repo',
+        private: false
+      },
+      release: {
+        tag_name: '1.0.0',
+        html_url: 'http://example.com'
+      }
+    })
+
     const response = await server.inject({
       method: 'POST',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'x-hub-signature-256': generateHeaderHash(body)
       },
       url: '/release',
-      body: JSON.stringify({
-        action: 'published',
-        repository: {
-          name: 'test_repo',
-          private: false
-        },
-        release: {
-          tag_name: '1.0.0',
-          html_url: 'http://example.com'
-        }
-      })
+      body
     })
 
     expect(response.statusCode).toBe(200)
@@ -154,23 +192,26 @@ describe('GH app', () => {
       TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET
     })
 
+    const body = JSON.stringify({
+      action: 'published',
+      repository: {
+        name: 'test_repo',
+        private: false
+      },
+      release: {
+        tag_name: '1.0.0',
+        html_url: 'http://example.com'
+      }
+    })
+
     const response = await server.inject({
       method: 'POST',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        'x-hub-signature-256': generateHeaderHash(body)
       },
       url: '/release',
-      body: JSON.stringify({
-        action: 'published',
-        repository: {
-          name: 'test_repo',
-          private: false
-        },
-        release: {
-          tag_name: '1.0.0',
-          html_url: 'http://example.com'
-        }
-      })
+      body
     })
 
     expect(response.statusCode).toBe(403)
