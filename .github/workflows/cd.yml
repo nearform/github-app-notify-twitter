@@ -9,20 +9,34 @@ on:
       run_service_name:
         description: 'Cloud Run service name'
         required: true
-        default: 'github-app-notify-twitter'
+        default: 'notify-twitter-test'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      GCP_PROJECT_ID: github-app-notify-twitter
+      GCP_CLOUDRUN_SERVICE_REGION: europe-west1
+      GCP_CLOUDRUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || 'notify-twitter' }}
+
     steps:
       - uses: actions/checkout@v3
-      - uses: google-github-actions/deploy-cloudrun@v0.9.0
+      - name: 'Authenticate with GCP'
+        uses: google-github-actions/auth@v0
         with:
-          service: ${{ secrets.GCP_CLOUDRUN_SERVICE_NAME }}
-          region: ${{ secrets.GCP_CLOUDRUN_SERVICE_REGION }}
-          credentials: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          env_vars: TWITTER_API_KEY=${{ secrets.TWITTER_API_KEY }},TWITTER_API_SECRET=${{ secrets.TWITTER_API_SECRET }},TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }},TWITTER_ACCESS_TOKEN_SECRET=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - name: 'Deploy to GCP'
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ env.GCP_CLOUDRUN_SERVICE_NAME }}
+          region: ${{ env.GCP_CLOUDRUN_SERVICE_REGION }}
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          env_vars: |
+            TWITTER_API_KEY=${{ secrets.TWITTER_API_KEY }},
+            TWITTER_API_SECRET=${{ secrets.TWITTER_API_SECRET }},
+            TWITTER_ACCESS_TOKEN=${{ secrets.TWITTER_ACCESS_TOKEN }},
+            TWITTER_ACCESS_TOKEN_SECRET=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
           flags: --allow-unauthenticated
           source: .

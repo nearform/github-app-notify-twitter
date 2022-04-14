@@ -1,4 +1,4 @@
-import buildServer from './server.js'
+import buildServer from './src/server.js'
 import config from './config.js'
 
 const server = buildServer(config)
