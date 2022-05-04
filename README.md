@@ -45,5 +45,6 @@ A Fastify application that can send messages to Twitter on release events on rep
     - `GCP_CLOUDRUN_SERVICE_REGION`: The [region](https://cloud.google.com/compute/docs/regions-zones) in the GCP that you want to create the cloud run service
     - `GCP_SA_KEY`: The key that you created for your service account with the permissions to deploy the app. This is a JSON object and should be used as-is.
     - `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_TOKEN` & `TWITTER_ACCESS_TOKEN_SECRET`: Twitter keys for your Twitter account you want to post the tweets to (can be obtained from the Twitter Developer Portal)
+    - `GH_WEBHOOK_SECRET`: A secret phrase that will be used to verify if the request really comes from the GitHub app installed on your organization/repo 
 - After the steps above are configured, go to `Actions` in your GitHub repo and run the CD workflow that is created in the folder `.github/workflows/cd.yaml`. The file is already configured with the action to deploy the cloud run service using the secrets that were created in the step above.
 - Once the workflow run, go to you GCP Account and open the "Cloud Run" page to see the details of the deployed service.
