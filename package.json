@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "lint:fix": "eslint --fix .",
+    "test": "jest",
     "prepare": "husky install"
   },
   "repository": {
@@ -21,14 +22,30 @@
   },
   "homepage": "https://github.com/nearform/bench-template#readme",
   "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/preset-env": "^7.16.11",
     "@commitlint/cli": "^16.2.4",
     "@commitlint/config-conventional": "^16.2.4",
+    "@jest/globals": "^27.5.1",
+    "babel-jest": "^27.5.1",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-jest": "^26.1.4",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
+    "jest": "^27.5.1",
     "lint-staged": "^12.4.1",
     "prettier": "^2.6.2"
+  },
+  "dependencies": {
+    "desm": "^1.2.0",
+    "dotenv": "^16.0.0",
+    "env-schema": "^4.0.0",
+    "fastify": "^3.28.0",
+    "fluent-json-schema": "^3.1.0",
+    "http-errors": "^2.0.0",
+    "pino-pretty": "^7.6.1",
+    "twitter-api-v2": "^1.11.3"
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --cache --fix"
