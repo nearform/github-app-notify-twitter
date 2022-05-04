@@ -15,6 +15,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: 'read'
+      id-token: write
+
     env:
       GCP_PROJECT_ID: github-app-notify-twitter
       GCP_CLOUDRUN_SERVICE_REGION: europe-west1
