@@ -26,7 +26,7 @@
     "@babel/preset-env": "^7.16.11",
     "@commitlint/cli": "^16.2.4",
     "@commitlint/config-conventional": "^16.2.4",
-    "@jest/globals": "^27.5.1",
+    "@jest/globals": "^28.0.3",
     "babel-jest": "^28.0.3",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
