@@ -5,7 +5,8 @@ const server = buildServer(config)
 
 const start = async () => {
   try {
-    await server.listen(process.env.PORT, '0.0.0.0')
+    const port = process.env.PORT || 8080
+    await server.listen(port, '0.0.0.0')
   } catch (err) {
     server.log.error(err)
     process.exit(1)
