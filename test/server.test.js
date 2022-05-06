@@ -21,7 +21,7 @@ const testServer = buildServer({
 
 const generateHeaderHash = (
   reqBody,
-  secret = process.env.GH_WEBHOOK_SECRET
+  secret = process.env.NOTIFY_TWITTER_WEBHOOK_SECRET
 ) => {
   const hash = createHmac('sha256', secret)
   hash.update(reqBody)
