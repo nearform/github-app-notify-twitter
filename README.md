@@ -30,10 +30,16 @@ A Fastify application that can send messages to Twitter on release events on rep
 
 - Prerequisites: a GCP project with the [cloud run and cloud build apis enabled](https://cloud.google.com/apis/docs/getting-started)
 - Create a Workload Identity Pool, the CD workflow uses OIDC type of authentication to deploy to GCP
-- Create a Service Account in the IAM & Admin console to be used to deploy the app and assign the `Service Account User` and `Workload Identity User` roles
+- Create a Service Account in the IAM & Admin console to be used to deploy the app and assign the following roles:
+    - `Service Account User`
+    - `Workload Identity User`
+    - `Cloud Build Editor`
+    - `Cloud Run Admin`
+    - `Artifact Registry Admin`
+    - `Storage Admin`
 - Clone this repo to your GitHub account
 - In the `Settings` of your GitHub repo, go to `Secrets` and create the `New repository secret` with the names and values below:
-    - `GCP_WORKLOAD_IDENTITY_PROVIDER`: The IAM Principal of the Workload Identity Pool
+    - `GCP_WORKLOAD_IDENTITY_PROVIDER`: The workload identity provider audience - should look something like this: `projects/<number>/locations/global/workloadIdentityPools/<pool>/providers/<provider>`
     - `GCP_SERVICE_ACCOUNT`: The email address of the Service Account - should be in the following form: `my-service-account@my-project.iam.gserviceaccount.com`
     - `GH_WEBHOOK_SECRET`: A secret phrase that will be used to verify if the request really comes from the GitHub app installed on your organization/repo 
     - `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_TOKEN` & `TWITTER_ACCESS_TOKEN_SECRET`: Twitter keys for your Twitter account you want to post the tweets to (can be obtained from the Twitter Developer Portal)
