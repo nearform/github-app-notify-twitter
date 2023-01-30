@@ -46,7 +46,7 @@
     "fluent-json-schema": "^4.0.0",
     "http-errors": "^2.0.0",
     "pino-pretty": "^9.1.1",
-    "twitter-api-v2": "^1.14.0"
+    "twitter-api-v2": "^1.14.1"
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --cache --fix"
