@@ -24,7 +24,7 @@
   "homepage": "https://github.com/nearform/github-app-notify-twitter#readme",
   "devDependencies": {
     "@babel/core": "^7.22.1",
-    "@babel/preset-env": "^7.22.2",
+    "@babel/preset-env": "^7.22.4",
     "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^17.6.3",
     "@jest/globals": "^29.4.2",
