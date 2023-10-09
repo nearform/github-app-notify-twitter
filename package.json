@@ -1,6 +1,6 @@
 {
   "name": "github-app-notify-twitter",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "A Fastify application that can send messages to Twitter on release events on repositories.",
   "main": "index.js",
   "type": "module",
