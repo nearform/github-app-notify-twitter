@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "test": "jest",
-    "prepare": "npx husky install",
+    "prepare": "npx husky",
     "start": "node index.js"
   },
   "repository": {
