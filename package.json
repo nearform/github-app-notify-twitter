@@ -45,7 +45,7 @@
     "fastify": "^4.28.1",
     "fluent-json-schema": "^5.0.0",
     "http-errors": "^2.0.0",
-    "pino-pretty": "^11.2.1",
+    "pino-pretty": "^11.2.2",
     "twitter-api-v2": "^1.17.2"
   },
   "lint-staged": {
