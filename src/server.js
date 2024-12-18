@@ -1,5 +1,4 @@
 import Fastify from 'fastify'
-import { TwitterApi } from 'twitter-api-v2'
 import {
   ERR_MISSING_INPUTS,
   ERR_TWITTER,
@@ -10,14 +9,8 @@ import {
 } from './constants.js'
 import verifyRequest from './verifyRequest.js'
 
-export default function buildServer(config) {
-  const client = new TwitterApi({
-    appKey: config.TWITTER_API_KEY,
-    appSecret: config.TWITTER_API_SECRET,
-    accessToken: config.TWITTER_ACCESS_TOKEN,
-    accessSecret: config.TWITTER_ACCESS_TOKEN_SECRET
-  })
-  const rwClient = client.readWrite
+export default function buildServer(config, twitterClient) {
+  const rwClient = twitterClient.readWrite
 
   const fastify = Fastify({
     logger: {
@@ -54,8 +47,8 @@ export default function buildServer(config) {
         await rwClient.v2.tweet(message)
         return reply.code(200).send('ok')
       } catch (err) {
-        fastify.log.error(ERR_TWITTER, err.data?.detail)
-        return reply.code(err.code).send(`${ERR_TWITTER} ${err.data?.detail}`)
+        fastify.log.error(err, ERR_TWITTER)
+        return reply.code(err.code).send(`${ERR_TWITTER}: ${err.data?.detail}`)
       }
     }
   )

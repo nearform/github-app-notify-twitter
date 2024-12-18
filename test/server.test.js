@@ -1,7 +1,7 @@
-'use strict'
+process.loadEnvFile('.env.test')
 
 import { createHmac } from 'crypto'
-import { TwitterApi } from 'twitter-api-v2'
+import { describe, test, mock } from 'node:test'
 import buildServer from '../src/server.js'
 import {
   ERR_TWITTER,
@@ -10,14 +10,18 @@ import {
   MSG_REPO_IS_NOT_PUBLISHED
 } from '../src/constants.js'
 
-const testServer = buildServer({
-  LOG_LEVEL: 'silent',
-  PRETTY_PRINT: false,
-  TWITTER_API_KEY: process.env.TWITTER_API_KEY,
-  TWITTER_API_SECRET: process.env.TWITTER_API_SECRET,
-  TWITTER_ACCESS_TOKEN: process.env.TWITTER_ACCESS_TOKEN,
-  TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET
-})
+const testServer = buildServer(
+  {
+    LOG_LEVEL: 'silent'
+  },
+  {
+    readWrite: {
+      v2: {
+        tweet: mock.fn()
+      }
+    }
+  }
+)
 
 const generateHeaderHash = (
   reqBody,
@@ -29,14 +33,8 @@ const generateHeaderHash = (
   return `sha256=${hash.digest('hex')}`
 }
 
-jest.mock('twitter-api-v2')
-
 describe('GH app', () => {
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it('release route, verifyRequest hook fails due to different secret', async () => {
+  test('release route, verifyRequest hook fails due to different secret', async t => {
     const body = JSON.stringify({})
 
     const response = await testServer.inject({
@@ -49,10 +47,10 @@ describe('GH app', () => {
       body
     })
 
-    expect(response.statusCode).toBe(401)
+    t.assert.strictEqual(response.statusCode, 401)
   })
 
-  it('release route, missing action, repository and release inputs', async () => {
+  test('release route, missing action, repository and release inputs', async t => {
     const body = JSON.stringify({})
 
     const response = await testServer.inject({
@@ -65,11 +63,11 @@ describe('GH app', () => {
       body
     })
 
-    expect(response.statusCode).toBe(500)
-    expect(response.body).toBe(ERR_MISSING_INPUTS)
+    t.assert.strictEqual(response.statusCode, 500)
+    t.assert.strictEqual(response.body, ERR_MISSING_INPUTS)
   })
 
-  it('release route, private repository', async () => {
+  test('release route, private repository', async t => {
     const body = JSON.stringify({
       action: 'published',
       repository: {
@@ -91,11 +89,11 @@ describe('GH app', () => {
       body
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toBe(MSG_REPO_IS_PRIVATE)
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(response.body, MSG_REPO_IS_PRIVATE)
   })
 
-  it('release route, action is not "published"', async () => {
+  test('release route, action is not "published"', async t => {
     const body = JSON.stringify({
       action: 'edited',
       repository: {
@@ -118,28 +116,23 @@ describe('GH app', () => {
       body
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toBe(MSG_REPO_IS_NOT_PUBLISHED)
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(response.body, MSG_REPO_IS_NOT_PUBLISHED)
   })
 
-  it('release route, successful tweet', async () => {
-    TwitterApi.mockImplementation(() => {
-      return {
+  test('release route, successful tweet', async t => {
+    const server = buildServer(
+      {
+        LOG_LEVEL: 'silent'
+      },
+      {
         readWrite: {
           v2: {
             tweet: async message => message || null
           }
         }
       }
-    })
-
-    const server = buildServer({
-      LOG_LEVEL: 'silent',
-      TWITTER_API_KEY: process.env.TWITTER_API_KEY,
-      TWITTER_API_SECRET: process.env.TWITTER_API_SECRET,
-      TWITTER_ACCESS_TOKEN: process.env.TWITTER_ACCESS_TOKEN,
-      TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET
-    })
+    )
 
     const body = JSON.stringify({
       action: 'published',
@@ -163,34 +156,32 @@ describe('GH app', () => {
       body
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toBe('ok')
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(response.body, 'ok')
   })
 
-  it('release route, Twitter API failure', async () => {
+  test('release route, Twitter API failure', async t => {
     const errMessage = 'No permissions to send tweets'
-    TwitterApi.mockImplementation(() => {
-      return {
+
+    const server = buildServer(
+      {
+        LOG_LEVEL: 'silent'
+      },
+      {
         readWrite: {
           v2: {
             tweet: async () => {
-              // Throw a Twitter exception
               throw {
                 code: 403,
-                data: { detail: errMessage }
+                data: {
+                  detail: errMessage
+                }
               }
             }
           }
         }
       }
-    })
-    const server = buildServer({
-      LOG_LEVEL: 'silent',
-      TWITTER_API_KEY: process.env.TWITTER_API_KEY,
-      TWITTER_API_SECRET: process.env.TWITTER_API_SECRET,
-      TWITTER_ACCESS_TOKEN: process.env.TWITTER_ACCESS_TOKEN,
-      TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET
-    })
+    )
 
     const body = JSON.stringify({
       action: 'published',
@@ -214,7 +205,7 @@ describe('GH app', () => {
       body
     })
 
-    expect(response.statusCode).toBe(403)
-    expect(response.body).toBe(`${ERR_TWITTER} ${errMessage}`)
+    t.assert.strictEqual(response.statusCode, 403)
+    t.assert.strictEqual(response.body, `${ERR_TWITTER}: ${errMessage}`)
   })
 })
