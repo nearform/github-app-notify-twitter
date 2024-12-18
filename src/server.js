@@ -21,8 +21,7 @@ export default function buildServer(config) {
 
   const fastify = Fastify({
     logger: {
-      level: config.LOG_LEVEL,
-      prettyPrint: config.PRETTY_PRINT
+      level: config.LOG_LEVEL
     }
   })
 
