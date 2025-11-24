@@ -25,7 +25,7 @@ jobs:
       GCP_CLOUDRUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || 'notify-twitter' }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: 'Authenticate with GCP'
         uses: google-github-actions/auth@v3
         with:
