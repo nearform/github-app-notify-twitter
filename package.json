@@ -23,14 +23,14 @@
   },
   "homepage": "https://github.com/nearform/github-app-notify-twitter#readme",
   "devDependencies": {
-    "@commitlint/cli": "^21.1.0",
-    "@commitlint/config-conventional": "^21.0.2",
+    "@commitlint/cli": "^21.2.0",
+    "@commitlint/config-conventional": "^21.2.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
-    "prettier": "^3.9.1"
+    "prettier": "^3.9.4"
   },
   "dependencies": {
     "env-schema": "^7.0.0",
