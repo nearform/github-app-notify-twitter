@@ -39,7 +39,7 @@
     "fastify": "^5.12.7",
     "fluent-json-schema": "^6.0.2",
     "http-errors": "^2.0.1",
-    "twitter-api-v2": "^1.29.1"
+    "twitter-api-v2": "^1.31.0"
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --cache --fix"
