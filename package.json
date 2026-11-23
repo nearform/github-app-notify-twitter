@@ -35,7 +35,7 @@
     "prettier": "^3.10.1"
   },
   "dependencies": {
-    "env-schema": "^8.0.1",
+    "env-schema": "^8.0.2",
     "fastify": "^5.12.8",
     "fluent-json-schema": "^6.0.2",
     "http-errors": "^2.0.1",
